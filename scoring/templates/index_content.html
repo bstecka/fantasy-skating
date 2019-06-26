@@ -1,0 +1,20 @@
+
+{% extends 'masterpage.html' %}
+{% block title %}Fantasy Skating - Home{% endblock %}
+{% block content %}
+
+<div class="panel">
+    <div class="panel-heading">
+      <ul class="nav nav-tabs">
+        <li role="presentation"><a href="/">Skate America</a></li>
+        <li role="presentation"><a href="/">Skate Canada</a></li>
+        <li role="presentation"><a href="/">Internationaux de France</a></li>
+        <li role="presentation"><a href="/">Cup of China</a></li>
+        <li role="presentation"><a href="/">Rostelecom Cup</a></li>
+        <li role="presentation"><a href="/">NHK Trophy</a>
+        <li role="presentation"><a href="/">Grand Prix Final</a></li>
+      </ul>
+    </div>
+    {% include "questions_list.html" %}
+</div>
+{% endblock %}

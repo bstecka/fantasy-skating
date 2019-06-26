@@ -1,0 +1,22 @@
+{% extends 'masterpage.html' %}
+
+{% load bootstrap3 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+
+{% block title %}
+    Registration
+{% endblock %}
+
+{% block content %}
+<div class="middle">
+  <h2 class="registration">Registration</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="btn btn-primary" type="submit">Register</button>
+  </form>
+  </div>
+{% endblock %}

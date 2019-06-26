@@ -1,0 +1,27 @@
+{% extends 'masterpage.html' %}
+
+{% load bootstrap3 %}
+
+{% block content %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<div class="container">
+    <div class="login-container">
+        <div class="row">
+            <div class="main">
+              <h3>Log in or create <a href="{% url 'register'%}">a new account</a></h3>
+            </div>
+            <div class="login-or"><hr class="hr-or"><span class="span-or"></span></div>
+            <form method="post" role="form" action="{% url 'login' %}">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary" value="login">Log In</button>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

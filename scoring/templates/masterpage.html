@@ -1,0 +1,77 @@
+<html>
+<head>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'masterpage-styles.css' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static 'iceskate.ico' %}" />
+    <title>{% block title %}Fantasy Skating{% endblock %}</title>
+
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand">Fantasy Skating</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li {% if request.path == '/' or request.path == '/questions/' or '/event' in request.path %}class="active"{% endif %}>
+            <a href="/">Brackets<span class="sr-only">(current)</span></a></li>
+        <li {% if request.path == '/ranking/' %}class="active"{% endif %}>
+        <a href="/ranking">Ranking</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+
+          {% if user.is_authenticated %}
+         <li>
+             <a href="{% url 'logout' %}?next={{request.path}}"><span class="glyphicon
+                    glyphicon-log-in"></span> Log out </a>
+         </li>
+         <li>
+             <a href="{% url 'profile' %}">
+                     <span class="glyphicon glyphicon-user"></span>
+                 {{ user.get_username }} </a>
+         </li>
+          {% else %}
+         <li>
+             <a href="{% url 'login' %}?next={{request.path}}">
+                 <span class="glyphicon glyphicon-log-in"></span> Log in </a>
+         </li>
+         <li>
+             <a href="{% url 'register'%}">
+                 <span class="glyphicon glyphicon-user"></span>
+                 Register </a>
+         </li>
+          {% endif %}
+
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container my-container"> <!-- proper content here -->
+    {% block content %}
+    {% endblock %}
+</div>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</body>
+</html>

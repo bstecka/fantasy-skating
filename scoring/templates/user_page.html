@@ -1,0 +1,45 @@
+{% extends 'masterpage.html' %}
+
+{% load bootstrap3 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block title %}
+Profile page - {{user.username}}
+{% endblock %}
+
+{% block content %}
+<div style="margin: 0 10%;">
+    <div>
+        <h5>Profile page</h5>
+        <hr>
+    </div>
+    {% if user.is_authenticated %}
+    <div>
+        <h1 style="margin-bottom:20">{{user.username}}</h1>
+        <form method="post">{% csrf_token %}
+        <div class="row">
+          <div class="col-sm-8 team-name-input">
+            <div class="input-group team-name-input">
+                <span class="input-group-addon">Team name</span>
+                <input id="team" type="text" class="form-control" name="team" value="{{user.first_name}}">
+                <input id="username" type="hidden" class="form-control" name="username" value="{{user.username}}">
+            </div>
+          </div>
+          <div class="col-sm-2 no-padding"><button class="btn btn-primary" type="submit">Update</button></div>
+        </div>
+        </form>
+        {% if name_changed is 1 %}
+        {% bootstrap_alert "Your team name has been changed" alert_type='success' dismissable=True %}
+        {% endif %}
+        <p>E-mail:</p>
+        <h4 style="margin-bottom:15">{{ user.email }}</h4>
+        <p>Total score:</p>
+        <h4 style="margin-bottom:30">300</h4>
+        <hr>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
