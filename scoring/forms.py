@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Competitor, ClassAssignmentForEvent
+from colorful.fields import RGBColorField
 
 
 class RegistrationForm(UserCreationForm):
@@ -24,12 +24,14 @@ class RegistrationForm(UserCreationForm):
 class ChangeTeamForm(forms.Form):
     team = forms.CharField(label='team')
     username = forms.CharField(label='username')
+    color = RGBColorField()
 
     def save(self):
         user = User.objects.get(username=self.data['username'])
         user.first_name = self.data['team']
+        user.last_name = self.data['color']
         user.save()
-        return
+        return self.data['color']
 
 
 class ChoiceForm(forms.Form):

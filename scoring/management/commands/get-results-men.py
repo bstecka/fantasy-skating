@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from bs4 import BeautifulSoup, NavigableString
-from ...models import Skater, Competitor, Category, Placement, Event
+from ...models import Skater, Competitor, Category, Placement, Event, User
 from .utils import handle_name
 import requests
 

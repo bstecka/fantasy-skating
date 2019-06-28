@@ -9,8 +9,9 @@
   margin-bottom: 10px;
 }
 
-.col-sm-2.no-padding {
+.col-sm-2.button {
   padding: 0px;
+  text-align: right;
 }
 
 .footer p {
@@ -115,7 +116,7 @@ a {
 
 .glyphicon {
   opacity: 1;
-  margin-right: 2px;
+  margin-right: 5px;
   transition: opacity .25s ease-in-out;
   -moz-transition: opacity .25s ease-in-out;
   -webkit-transition: opacity .25s ease-in-out;
@@ -161,6 +162,31 @@ a {
     margin-right: 20%;
 }
 
-.choose-button{
+.choose-button {
     padding-bottom: 10;
+}
+
+.panel-content {
+    padding: 5 20 20 20;
+}
+
+.current-page {
+    padding: 0 8 5 8;
+}
+
+.paginate {
+    text-align: center;
+    width: 100%;
+}
+
+.user-header {
+    margin-bottom: 20;
+}
+
+.username-header {
+    margin-bottom: 20;
+}
+
+.user-form {
+    margin-bottom: 20;
 }

@@ -17,26 +17,43 @@ Profile page - {{user.username}}
     </div>
     {% if user.is_authenticated %}
     <div>
-        <h1 style="margin-bottom:20">{{user.username}}</h1>
-        <form method="post">{% csrf_token %}
-        <div class="row">
-          <div class="col-sm-8 team-name-input">
-            <div class="input-group team-name-input">
-                <span class="input-group-addon">Team name</span>
-                <input id="team" type="text" class="form-control" name="team" value="{{user.first_name}}">
-                <input id="username" type="hidden" class="form-control" name="username" value="{{user.username}}">
+        <h1 class="username-header">Logged in as {{user.username|title }}</h1>
+        <form class="user-form" method="post">{% csrf_token %}
+            <div class="row">
+              <div class="col-sm-8 team-name-input">
+                  <div class="input-group team-name-input">
+                      <span class="input-group-addon">Team name</span>
+                      <input id="team" type="text" class="form-control" name="team"
+                          {% if team %} value="{{team}}" {% else %} value="{{user.first_name}}" {% endif %}>
+                      <input id="username" type="hidden" class="form-control" name="username" value="{{user.username}}">
+                  </div>
+              </div>
             </div>
-          </div>
-          <div class="col-sm-2 no-padding"><button class="btn btn-primary" type="submit">Update</button></div>
-        </div>
+            <div class="row">
+                  <div class="col-sm-8 team-name-input">
+                      <div class="input-group team-name-input">
+                          <span class="input-group-addon">Team name color</span>
+                          <input id="color" type="color" class="form-control" name="color"
+                                 {% if color %}
+                                 value="{{color}}"
+                                 {% elif user.last_name %}
+                                 value="{{user.last_name}}"
+                                 {% else %}
+                                 value="#000000"
+                                 {% endif %}
+                          >
+                      </div>
+                  </div>
+            </div>
+            <div>
+                <button class="btn btn-default" type="submit">Update</button>
+            </div>
         </form>
         {% if name_changed is 1 %}
         {% bootstrap_alert "Your team name has been changed" alert_type='success' dismissable=True %}
         {% endif %}
-        <p>E-mail:</p>
-        <h4 style="margin-bottom:15">{{ user.email }}</h4>
-        <p>Total score:</p>
-        <h4 style="margin-bottom:30">300</h4>
+        <p>Total Score:</p>
+        <h4 class="user-header">{{ total_score|floatformat:2 }}</h4>
         <hr>
     </div>
     {% endif %}

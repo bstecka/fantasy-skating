@@ -27,8 +27,10 @@ SECRET_KEY = 'oqfg)0qjwi5q=#3xxox2(bi-uy(g+jh_125d89(z^dd4hpgjbm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
+
+#DEBUG = False
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '111.222.333.444', 'mywebsite.com']
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
+    'colorful',
     'scoring'
 ]
 
