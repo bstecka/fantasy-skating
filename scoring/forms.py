@@ -55,7 +55,7 @@ class ChoiceForm(forms.Form):
             choice = choices.first().competitor
             self.fields[field_name].initial = (choice.id, choice)
         if is_disabled:
-            self.fields[field_name].disabled = True
+            self.fields[field_name].disabled = False
 
     def __init__(self, LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled, *args, **kwargs):
         super(ChoiceForm, self).__init__(*args, **kwargs)

@@ -50,6 +50,7 @@ class PlacementAdmin(admin.ModelAdmin):
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
+            last_event = Event.objects.get(short_name=EVENT)
             try:
                 management.call_command('get-results-men', url=last_event.event_url, event_name=last_event.name)
                 message = 'successfully imported data from URL'
@@ -66,6 +67,7 @@ class PlacementAdmin(admin.ModelAdmin):
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
+            last_event = Event.objects.get(short_name=EVENT)
             try:
                 management.call_command('get-results-ladies', url=last_event.event_url, event_name=last_event.name)
                 message = 'successfully imported data from URL'
@@ -82,6 +84,7 @@ class PlacementAdmin(admin.ModelAdmin):
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
+            last_event = Event.objects.get(short_name=EVENT)
             try:
                 management.call_command('get-results-pairs', url=last_event.event_url, event_name=last_event.name)
                 message = 'successfully imported data from URL'
@@ -98,6 +101,7 @@ class PlacementAdmin(admin.ModelAdmin):
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
+            last_event = Event.objects.get(short_name=EVENT)
             try:
                 management.call_command('get-results-icedance', url=last_event.event_url, event_name=last_event.name)
                 message = 'successfully imported data from URL'

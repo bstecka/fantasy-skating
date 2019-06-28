@@ -5,8 +5,11 @@ from .models import Competitor, Placement, ClassAssignmentForEvent, CategoryClas
 from django.views.generic import ListView
 from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.core.paginator import Paginator
+from operator import itemgetter
 import datetime
 from datetime import timedelta
 # Create your views here.
@@ -28,10 +31,6 @@ class ChoicesList(ListView):
         return CategoryClass.objects.all()
 
 
-def ranking(request):
-    return render(request, 'ranking.html')
-
-
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -41,10 +40,69 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect(reverse('index'))
+            return redirect('/')
     else:
         form = RegistrationForm()
     return render(request, 'register_form.html', {'form': form})
+
+
+@login_required
+def ranking_last(request, page):
+    print("RANKING LAST")
+    number_per_page = 5
+    current_user = request.user
+    users = User.objects.all().order_by()
+    user_scores = []
+    paginated_users = Paginator(users, number_per_page).page(page)
+    now = timezone.now()
+    events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
+    if len(events) > 0:
+        last_event = events[0]
+    else:
+        last_event = None
+    for user in paginated_users:
+        user_choices = Choice.objects.filter(user=user, event=last_event)
+        user_sum = 0
+        for choice in user_choices:
+            competitor = choice.competitor
+            event = choice.event
+            placement_model = Placement.objects.filter(competitor=competitor, event=event).first()
+            if placement_model is not None:
+                user_sum += placement_model.total_score
+                if placement_model.placement < 4:
+                    user_sum += 15 - 5 * (placement_model.placement - 1)
+        user_scores.append((user, user_sum))
+    user_scores.sort(key=itemgetter(1), reverse=True)
+    user_scores_enumerated = []
+    for num, user_score in enumerate(user_scores, start=1+number_per_page*(page-1)):
+        user_scores_enumerated.append(user_score + (num,))
+    return render(request, 'ranking.html', {'current_user': current_user, 'user_scores': user_scores_enumerated, 'paginated_users': paginated_users})
+
+
+@login_required
+def ranking(request, page):
+    number_per_page = 5
+    current_user = request.user
+    users = User.objects.all()
+    user_scores = []
+    paginated_users = Paginator(users, number_per_page).page(page)
+    for user in paginated_users:
+        user_choices = Choice.objects.filter(user=user)
+        user_sum = 0
+        for choice in user_choices:
+            competitor = choice.competitor
+            event = choice.event
+            placement_model = Placement.objects.filter(competitor=competitor, event=event).first()
+            if placement_model is not None:
+                user_sum += placement_model.total_score
+                if placement_model.placement < 4:
+                    user_sum += 15 - 5 * (placement_model.placement - 1)
+        user_scores.append((user, user_sum))
+    user_scores.sort(key=itemgetter(1), reverse=True)
+    user_scores_enumerated = []
+    for num, user_score in enumerate(user_scores, start=1+number_per_page*(page-1)):
+        user_scores_enumerated.append(user_score + (num,))
+    return render(request, 'ranking.html', {'current_user': current_user, 'user_scores': user_scores_enumerated, 'paginated_users': paginated_users})
 
 
 def user_page(request):

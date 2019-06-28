@@ -6,9 +6,44 @@
 <div class="panel">
     <div class="panel-heading">
       <ul class="nav nav-tabs">
-        <li role="presentation"><a href="/">Overall Ranking</a></li>
-        <li role="presentation"><a href="/">Last Event</a></li>
+        <li role="presentation" {% if 'last' not in request.path %}class="active"{% endif %}><a href="/ranking/1">Overall Ranking</a></li>
+        <li role="presentation" {% if 'last' in request.path %}class="active"{% endif %}><a href="/ranking/last/1">Last Event</a></li>
       </ul>
+    </div>
+    <div class="panel-content">
+        <table class="table table-condensed normal">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team Name</th>
+              <th>Total Score</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for user_score in user_scores  %}
+          <tr {% if user_score.0 == current_user %}class="info"{% endif %}>
+              <th scope="row">{{user_score.2}}</th>
+              <td>{{user_score.0.first_name}}</td>
+              <td>{{user_score.1|floatformat:2}}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        <div class="paginate">
+            <a class="btn btn-default no-background" href="1" role="button">First Page</a>
+            {% if paginated_users.has_previous %}
+            <a class="btn btn-default no-background" href="{{ paginated_users.previous_page_number }}" role="button">Previous Page</a>
+            {% else %}
+            <a class="btn btn-default no-background" href="1" role="button">Previous Page</a>
+            {% endif %}
+            <span class="current-page">Page {{ paginated_users.number }} of {{ paginated_users.paginator.num_pages }}</span>
+            {% if paginated_users.has_next %}
+            <a class="btn btn-default no-background" href="{{ paginated_users.next_page_number }}" role="button">Next Page</a>
+            {% else %}
+            <a class="btn btn-default no-background" href="{{ paginated_users.paginator.num_pages }}" role="button">Next Page</a>
+            {% endif %}
+            <a class="btn btn-default no-background" href="{{ paginated_users.paginator.num_pages }}" role="button">Last Page</a>
+        </div>
     </div>
 </div>
 {% endblock %}
