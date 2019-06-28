@@ -34,10 +34,9 @@
         <li {% if request.path == '/' or request.path == '/questions/' or '/event' in request.path %}class="active"{% endif %}>
             <a href="/">Brackets<span class="sr-only">(current)</span></a></li>
         <li {% if '/ranking/' in request.path %}class="active"{% endif %}>
-        <a href="/ranking/1">Ranking</a></li>
+        <a href="/ranking/me">Ranking</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-
           {% if user.is_authenticated %}
          <li>
              <a href="{% url 'logout' %}?next={{request.path}}"><span class="glyphicon

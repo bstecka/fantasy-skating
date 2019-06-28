@@ -101,3 +101,13 @@ class Entry(models.Model):
 
     def __str__(self):
         return self.event.__str__() + ' ' + self.competitor.__str__()
+
+
+@python_2_unicode_compatible
+class EventUserScore(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    score = models.FloatField(blank=True, default=None, null=True)
+
+    def __str__(self):
+        return self.event.__str__() + ' ' + self.user.__str__() + ' ' + self.score.__str__()

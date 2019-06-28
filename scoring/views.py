@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404, render, redirect, reverse
 from django.db.models import Q
 from .forms import RegistrationForm, ChangeTeamForm, ChoiceForm
-from .models import Competitor, Placement, ClassAssignmentForEvent, CategoryClass, Event, Category, Choice
-from django.views.generic import ListView
+from .models import Competitor, Placement, ClassAssignmentForEvent, CategoryClass, Event, Category, Choice, EventUserScore
+from django.db.models import Sum
 from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
@@ -10,25 +10,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.core.paginator import Paginator
 from operator import itemgetter
-import datetime
+from itertools import groupby
 from datetime import timedelta
-# Create your views here.
 import logging
 logger = logging.getLogger(__name__)
-
-
-class ChoicesList(ListView):
-    model = CategoryClass
-    context_object_name = 'classes'
-    selected_tab = ''
-    template_name = 'index_content.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ChoicesList, self).get_context_data(**kwargs)
-        return context
-
-    def get_queryset(self):
-        return CategoryClass.objects.all()
 
 
 def register(request):
@@ -46,48 +31,98 @@ def register(request):
     return render(request, 'register_form.html', {'form': form})
 
 
+def view_404(request):
+    return redirect('/')
+
+
 @login_required
 def ranking_last(request, page):
-    print("RANKING LAST")
-    number_per_page = 5
-    current_user = request.user
-    users = User.objects.all().order_by()
-    user_scores = []
-    paginated_users = Paginator(users, number_per_page).page(page)
-    now = timezone.now()
-    events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
-    if len(events) > 0:
-        last_event = events[0]
-    else:
-        last_event = None
-    for user in paginated_users:
-        user_choices = Choice.objects.filter(user=user, event=last_event)
-        user_sum = 0
-        for choice in user_choices:
-            competitor = choice.competitor
-            event = choice.event
-            placement_model = Placement.objects.filter(competitor=competitor, event=event).first()
-            if placement_model is not None:
-                user_sum += placement_model.total_score
-                if placement_model.placement < 4:
-                    user_sum += 15 - 5 * (placement_model.placement - 1)
-        user_scores.append((user, user_sum))
-    user_scores.sort(key=itemgetter(1), reverse=True)
-    user_scores_enumerated = []
-    for num, user_score in enumerate(user_scores, start=1+number_per_page*(page-1)):
-        user_scores_enumerated.append(user_score + (num,))
-    return render(request, 'ranking.html', {'current_user': current_user, 'user_scores': user_scores_enumerated, 'paginated_users': paginated_users})
+    return ranking(request, page)
 
 
 @login_required
-def ranking(request, page):
+def ranking_overall(request, page):
+    return ranking(request, page, is_overall=True)
+
+
+@login_required
+def ranking_last_me(request):
+    return ranking(request, is_me=True)
+
+
+@login_required
+def ranking_overall_me(request):
+    return ranking(request, is_overall=True, is_me=True)
+
+
+@login_required
+def ranking(request, page=1, is_overall=False, is_me=False):
     number_per_page = 5
     current_user = request.user
     users = User.objects.all()
     user_scores = []
-    paginated_users = Paginator(users, number_per_page).page(page)
-    for user in paginated_users:
-        user_choices = Choice.objects.filter(user=user)
+    event_name = None
+    for user in users:
+        if is_overall:
+            user_sum = EventUserScore.objects.filter(user=user).aggregate(Sum('score'))['score__sum']
+        else:
+            now = timezone.now()
+            now = now - timedelta(days=235) #######################################################################DATES
+            events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
+            if len(events) > 0:
+                user_sum = EventUserScore.objects.filter(user=user, event=events[0]).aggregate(Sum('score'))['score__sum']
+                event_name = events[0].name
+                if user_sum is None:
+                    user_sum = 0.0
+            else:
+                user_sum = 0.0
+        user_scores.append((user, user_sum))
+    user_scores.sort(key=itemgetter(1), reverse=True)
+    user_scores_enumerated = []
+    for rank, (_, grp) in enumerate(groupby(user_scores, key=lambda xs: xs[1]), 1):
+        for x in grp:
+            user_scores_enumerated.append(x + (rank,))
+    if is_me:
+        user_page_num = 1
+        for num, (user, score) in enumerate(user_scores):
+            if user == current_user:
+                user_num = num
+                user_page_num = int(user_num / number_per_page) + 1
+        paginated_users = Paginator(user_scores_enumerated, number_per_page).page(user_page_num)
+        user_scores_enumerated = paginated_users
+    else:
+        paginated_users = Paginator(user_scores_enumerated, number_per_page).page(page)
+        user_scores_enumerated = paginated_users
+    return render(request, 'ranking.html', {'current_user': current_user, 'user_scores': user_scores_enumerated,
+                                            'paginated_users': paginated_users, 'event_name': event_name})
+
+
+@login_required
+def ranking_last_ineffective(request, page):
+    return ranking_ineffective(request, page, is_overall=False)
+
+
+@login_required
+def ranking_overall_ineffective(request, page):
+    return ranking_ineffective(request, page, is_overall=True)
+
+
+@login_required
+def ranking_ineffective(request, page, is_overall):
+    number_per_page = 5
+    current_user = request.user
+    users = User.objects.all()
+    user_scores = []
+    for user in users:
+        if is_overall:
+            user_choices = Choice.objects.filter(user=user)
+        else:
+            now = timezone.now()
+            events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
+            if len(events) > 0:
+                user_choices = Choice.objects.filter(user=user, event=events[0])
+            else:
+                user_choices = Choice.objects.none()
         user_sum = 0
         for choice in user_choices:
             competitor = choice.competitor
@@ -102,22 +137,31 @@ def ranking(request, page):
     user_scores_enumerated = []
     for num, user_score in enumerate(user_scores, start=1+number_per_page*(page-1)):
         user_scores_enumerated.append(user_score + (num,))
+    paginated_users = Paginator(user_scores_enumerated, number_per_page).page(page)
+    user_scores_enumerated = paginated_users
     return render(request, 'ranking.html', {'current_user': current_user, 'user_scores': user_scores_enumerated, 'paginated_users': paginated_users})
 
 
 def user_page(request):
     current_user = request.user
-    logger.error('user_page')
+    total_score = 0
+    user_choices = Choice.objects.filter(user=current_user)
+    for choice in user_choices:
+        competitor = choice.competitor
+        event = choice.event
+        placement_model = Placement.objects.filter(competitor=competitor, event=event).first()
+        if placement_model is not None:
+            total_score += placement_model.total_score
+            if placement_model.placement < 4:
+                total_score += 15 - 5 * (placement_model.placement - 1)
     if request.method == 'POST':
         form = ChangeTeamForm(request.POST)
-        logger.error('post')
         if form.is_valid():
-            logger.error('valid')
-            form.save()
+            color = form.save()
             team = form.cleaned_data.get('team')
-            logger.error(team)
-            return render(request, 'user_page.html', {'user': current_user, 'name_changed': 1})
-    return render(request, 'user_page.html', {'user': current_user, 'name_changed': 0})
+            return render(request, 'user_page.html', {'user': current_user, 'name_changed': 1,
+                                                      'total_score': total_score, 'color': color, 'team': team})
+    return render(request, 'user_page.html', {'user': current_user, 'name_changed': 0, 'total_score': total_score})
 
 
 def get_class_assignments(event, category_class, category):
@@ -167,8 +211,8 @@ def choice_form_next(request):
     current_user = request.user
     now = timezone.now()
     # 255 days -> skate america, 245 -> skate canada, 238 -> gp helsinki, 230 -> nhk trophy
-    last_year = now - timedelta(days=245)
-    event = Event.objects.filter(start_date__gte=last_year).order_by('start_date')[0]
+    last_year = now - timedelta(days=235)
+    event = Event.objects.filter(end_date__gte=last_year).order_by('start_date')[0]
     event_name = event.name
     events = Event.objects.all().order_by('start_date')
     LA = get_class_assignments(event_name, 'A', 'Ladies')
@@ -217,7 +261,7 @@ def choice_form(request, event_path):
     DB = get_class_assignments(event, 'B', 'Ice Dance')
     DC = get_class_assignments(event, 'C', 'Ice Dance')
     now = timezone.now()
-    last_year = now - timedelta(days=245)
+    last_year = now - timedelta(days=235)
     events = Event.objects.all().order_by('start_date')
     choices = Choice.objects.filter(user=current_user, event=event)
     is_disabled = False

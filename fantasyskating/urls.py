@@ -26,12 +26,15 @@ admin.autodiscover()
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', views.register, name='register'),
-    path('ranking/<int:page>', views.ranking, name='ranking'),
+    path('ranking/<int:page>', views.ranking_overall, name='ranking'),
+    path('ranking/me', views.ranking_overall_me, name='ranking_me'),
+    path('ranking/last/me', views.ranking_last_me, name='ranking_last_me'),
     path('ranking/last/<int:page>', views.ranking_last, name='ranking_last'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('profile/', views.user_page, name='profile'),
-    #path('choice/', views.choice_form, name='choice_form_'),
     path('event/<str:event_path>', views.choice_form, name='choice_form'),
     path('', views.choice_form_next, name='choice_form_next'),
     path('index/', views.choice_form_next, name='choice_form_next'),
 ]
+
+handler404 = 'scoring.views.view_404'

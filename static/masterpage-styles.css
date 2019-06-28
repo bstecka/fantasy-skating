@@ -9,8 +9,9 @@
   margin-bottom: 10px;
 }
 
-.col-sm-2.no-padding {
+.col-sm-2.button {
   padding: 0px;
+  text-align: right;
 }
 
 .footer p {
@@ -176,4 +177,16 @@ a {
 .paginate {
     text-align: center;
     width: 100%;
+}
+
+.user-header {
+    margin-bottom: 20;
+}
+
+.username-header {
+    margin-bottom: 20;
+}
+
+.user-form {
+    margin-bottom: 20;
 }
