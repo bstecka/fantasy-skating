@@ -15,8 +15,7 @@ class Command(BaseCommand):
     def process_data(self, first_name1, last_name1, first_name2, last_name2, score, event_name, rank, arg):
         db_skaters = Skater.objects.all()
         db_competitors = Competitor.objects.all()
-        categories = Category.objects.filter(name__contains='Pairs')
-        category = categories[0]
+        category = Category.objects.filter(name__contains='Pairs').first()
         events = Event.objects.filter(name__contains=event_name)
         event = events[0]
         self.stdout.write(self.style.SUCCESS(str(category)))

@@ -80,7 +80,8 @@ class Choice(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.event.__str__() + ' - ' + self.category_class.__str__() + ': ' + self.competitor.__str__()
+        return self.user.__str__() + ' ' + self.event.__str__() + ' - ' + self.category.__str__() + ' ' +\
+               self.category_class.__str__() + ': ' + self.competitor.__str__()
 
 
 @python_2_unicode_compatible

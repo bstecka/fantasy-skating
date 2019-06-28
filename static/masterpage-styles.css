@@ -146,7 +146,7 @@ a {
 
 .multiple-choice-field {
     padding-top: 15;
-    padding-right: 20;
+    padding-right: 40;
 }
 
 .field-label {
@@ -161,6 +161,6 @@ a {
     margin-right: 20%;
 }
 
-.button-blue{
-
+.choose-button{
+    padding-bottom: 10;
 }

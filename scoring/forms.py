@@ -46,26 +46,45 @@ class ChoiceForm(forms.Form):
     DanceB = forms.ChoiceField(required=True, widget=forms.RadioSelect, label="Dance B")
     DanceC = forms.ChoiceField(required=True, widget=forms.RadioSelect, label="Dance C")
 
-    def set_field(self, field_name, query_set):
+    def set_field(self, field_name, query_set, choices, is_disabled):
         competitors = []
         for index, assignment in enumerate(query_set):
-            competitors.append((assignment.competitor, assignment.competitor))
+            competitors.append((assignment.competitor.id, assignment.competitor))
         self.fields[field_name].choices = competitors
+        if choices.first() is not None:
+            choice = choices.first().competitor
+            self.fields[field_name].initial = (choice.id, choice)
+        if is_disabled:
+            self.fields[field_name].disabled = True
 
-    def __init__(self, LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, *args, **kwargs):
+    def __init__(self, LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled, *args, **kwargs):
         super(ChoiceForm, self).__init__(*args, **kwargs)
-        self.set_field('LadiesA', LA)
-        self.set_field('LadiesB', LB)
-        self.set_field('LadiesC', LC)
-        self.set_field('MenA', MA)
-        self.set_field('MenB', MB)
-        self.set_field('MenC', MC)
-        self.set_field('PairsA', PA)
-        self.set_field('PairsB', PB)
-        self.set_field('PairsC', PC)
-        self.set_field('DanceA', DA)
-        self.set_field('DanceB', DB)
-        self.set_field('DanceC', DC)
+        if choices.first() is not None:
+            self.set_field('LadiesA', LA, choices.filter(category__name='Ladies', category_class__name='A'), is_disabled)
+            self.set_field('LadiesB', LB, choices.filter(category__name='Ladies', category_class__name='B'), is_disabled)
+            self.set_field('LadiesC', LC, choices.filter(category__name='Ladies', category_class__name='C'), is_disabled)
+            self.set_field('MenA', MA, choices.filter(category__name='Men', category_class__name='A'), is_disabled)
+            self.set_field('MenB', MB, choices.filter(category__name='Men', category_class__name='B'), is_disabled)
+            self.set_field('MenC', MC, choices.filter(category__name='Men', category_class__name='C'), is_disabled)
+            self.set_field('PairsA', PA, choices.filter(category__name='Pairs', category_class__name='A'), is_disabled)
+            self.set_field('PairsB', PB, choices.filter(category__name='Pairs', category_class__name='B'), is_disabled)
+            self.set_field('PairsC', PC, choices.filter(category__name='Pairs', category_class__name='C'), is_disabled)
+            self.set_field('DanceA', DA, choices.filter(category__name='Ice Dance', category_class__name='A'), is_disabled)
+            self.set_field('DanceB', DB, choices.filter(category__name='Ice Dance', category_class__name='B'), is_disabled)
+            self.set_field('DanceC', DC, choices.filter(category__name='Ice Dance', category_class__name='C'), is_disabled)
+        else:
+            self.set_field('LadiesA', LA, choices, is_disabled)
+            self.set_field('LadiesB', LB, choices, is_disabled)
+            self.set_field('LadiesC', LC, choices, is_disabled)
+            self.set_field('MenA', MA, choices, is_disabled)
+            self.set_field('MenB', MB, choices, is_disabled)
+            self.set_field('MenC', MC, choices, is_disabled)
+            self.set_field('PairsA', PA, choices, is_disabled)
+            self.set_field('PairsB', PB, choices, is_disabled)
+            self.set_field('PairsC', PC, choices, is_disabled)
+            self.set_field('DanceA', DA, choices, is_disabled)
+            self.set_field('DanceB', DB, choices, is_disabled)
+            self.set_field('DanceC', DC, choices, is_disabled)
 
     def save(self):
         return

@@ -2,8 +2,9 @@ from django.contrib import admin
 from .models import Category, CategoryClass, Skater, Competitor, Event, Placement, Choice, ClassAssignmentForEvent, Entry
 from django.core import management
 from django.shortcuts import redirect
-import datetime
 from datetime import timedelta
+from django.utils import timezone
+
 
 # Register your models here.
 admin.site.register(Category)
@@ -45,7 +46,7 @@ def assign_class(event, entries):
 class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-results-men', 'Get newest results - Men')
     def get_results_men(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
@@ -61,7 +62,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-results-ladies', 'Get newest results - Ladies')
     def get_results_ladies(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
@@ -77,7 +78,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-results-pairs', 'Get newest results - Pairs')
     def get_results_pairs(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
@@ -93,7 +94,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-results-icedance', 'Get newest results - Ice Dance')
     def get_results_icedance(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
             last_event = events[0]
@@ -109,7 +110,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-entries-men', 'Get next event entries - Men')
     def get_entries_men(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         now = now - timedelta(days=365)
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -129,7 +130,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-entries-ladies', 'Get next event entries - Ladies')
     def get_entries_ladies(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         now = now - timedelta(days=365)
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -149,7 +150,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-entries-pairs', 'Get next event entries - Pairs')
     def get_entries_pairs(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         now = now - timedelta(days=365)
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -169,7 +170,7 @@ class PlacementAdmin(admin.ModelAdmin):
 
     @admin.site.register_view('get-entries-icedance', 'Get next event entries - Ice Dance')
     def get_entries_icedance(request):
-        now = datetime.datetime.now()
+        now = timezone.now()
         now = now - timedelta(days=365)
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:

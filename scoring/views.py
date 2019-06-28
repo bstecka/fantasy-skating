@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404, render, redirect, reverse
 from django.db.models import Q
 from .forms import RegistrationForm, ChangeTeamForm, ChoiceForm
-from django.contrib import admin
 from .models import Competitor, Placement, ClassAssignmentForEvent, CategoryClass, Event, Category, Choice
 from django.views.generic import ListView
-from django.core import management
 from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 import datetime
 from datetime import timedelta
 # Create your views here.
@@ -68,18 +68,16 @@ def get_class_assignments(event, category_class, category):
                                                   competitor__skater_1__category__name=category)
 
 
-def save_choice(user, competitor, event, category, category_class):
-    competitor = Competitor.objects.filter()
-    '''
+def save_choice(user, competitor_id, event, category, category_class):
+    competitor = Competitor.objects.get(id=competitor_id)
     if Choice.objects.filter(user=user, event=event, category=category, category_class=category_class).exists():
         choice = Choice.objects.filter(user=user, event=event, category=category, category_class=category_class).first()
-        choice.competitor = competitor[0]
+        choice.competitor = competitor
         choice.save()
     else:
-        choice = Choice.objects.create(user=user, competitor=competitor[0], event=event, category=category,
+        choice = Choice.objects.create(user=user, competitor=competitor, event=event, category=category,
                                        category_class=category_class)
     print(choice.__str__())
-    '''
     return
 
 
@@ -106,13 +104,13 @@ def save_choices(user, form, event):
     return
 
 
+@login_required
 def choice_form_next(request):
     current_user = request.user
-    now = datetime.datetime.now()
+    now = timezone.now()
     # 255 days -> skate america, 245 -> skate canada, 238 -> gp helsinki, 230 -> nhk trophy
     last_year = now - timedelta(days=245)
-    events = Event.objects.filter(start_date__gte=last_year).order_by('start_date')
-    event = events[0]
+    event = Event.objects.filter(start_date__gte=last_year).order_by('start_date')[0]
     event_name = event.name
     events = Event.objects.all().order_by('start_date')
     LA = get_class_assignments(event_name, 'A', 'Ladies')
@@ -127,33 +125,27 @@ def choice_form_next(request):
     DA = get_class_assignments(event_name, 'A', 'Ice Dance')
     DB = get_class_assignments(event_name, 'B', 'Ice Dance')
     DC = get_class_assignments(event_name, 'C', 'Ice Dance')
+    choices = Choice.objects.filter(user=current_user, event=event)
+    is_disabled = False
+    now = last_year
+    if now > event.start_date:
+        is_disabled = True
     if request.method == 'POST':
-        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, request.POST)
+        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled, request.POST)
         if form.is_valid():
             form.save()
-            logger.error(form.cleaned_data.get('LadiesB'))
-            logger.error(form.cleaned_data.get('LadiesC'))
-            logger.error(form.cleaned_data.get('MenA'))
-            logger.error(form.cleaned_data.get('MenB'))
-            logger.error(form.cleaned_data.get('MenC'))
-            logger.error(form.cleaned_data.get('PairsA'))
-            logger.error(form.cleaned_data.get('PairsB'))
-            logger.error(form.cleaned_data.get('PairsC'))
-            logger.error(form.cleaned_data.get('DanceA'))
-            logger.error(form.cleaned_data.get('DanceB'))
-            logger.error(form.cleaned_data.get('DanceC'))
             save_choices(current_user, form, event)
             return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events, 'next_event_name': event_name})
     else:
-        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC)
+        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled)
     return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events, 'next_event_name': event_name})
 
 
+@login_required
 def choice_form(request, event_path):
     current_user = request.user
     print(event_path)
-    events = Event.objects.filter(Q(event_url__contains=event_path))
-    event = events[0]
+    event = Event.objects.filter(Q(event_url__contains=event_path))[0]
     LA = get_class_assignments(event, 'A', 'Ladies')
     LB = get_class_assignments(event, 'B', 'Ladies')
     LC = get_class_assignments(event, 'C', 'Ladies')
@@ -166,28 +158,21 @@ def choice_form(request, event_path):
     DA = get_class_assignments(event, 'A', 'Ice Dance')
     DB = get_class_assignments(event, 'B', 'Ice Dance')
     DC = get_class_assignments(event, 'C', 'Ice Dance')
-    now = datetime.datetime.now()
-    last_year = now - timedelta(days=365)
-    events = Event.objects.filter(start_date__gte=last_year).order_by('start_date')
-
+    now = timezone.now()
+    last_year = now - timedelta(days=245)
+    events = Event.objects.all().order_by('start_date')
+    choices = Choice.objects.filter(user=current_user, event=event)
+    is_disabled = False
+    now = last_year
+    if now > event.start_date:
+        is_disabled = True
     if request.method == 'POST':
-        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, request.POST)
+        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled, request.POST)
         if form.is_valid():
             form.save()
-            logger.error(form.cleaned_data.get('LadiesB'))
-            logger.error(form.cleaned_data.get('LadiesC'))
-            logger.error(form.cleaned_data.get('MenA'))
-            logger.error(form.cleaned_data.get('MenB'))
-            logger.error(form.cleaned_data.get('MenC'))
-            logger.error(form.cleaned_data.get('PairsA'))
-            logger.error(form.cleaned_data.get('PairsB'))
-            logger.error(form.cleaned_data.get('PairsC'))
-            logger.error(form.cleaned_data.get('DanceA'))
-            logger.error(form.cleaned_data.get('DanceB'))
-            logger.error(form.cleaned_data.get('DanceC'))
             save_choices(current_user, form, event)
             return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events})
     else:
-        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC)
+        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled)
     return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events})
 

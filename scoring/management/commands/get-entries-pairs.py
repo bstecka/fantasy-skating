@@ -15,8 +15,7 @@ class Command(BaseCommand):
     def process_data(self, first_name1, last_name1, first_name2, last_name2, world_standings, event_name):
         db_skaters = Skater.objects.all()
         db_competitors = Competitor.objects.all()
-        categories = Category.objects.filter(name__contains='Pairs')
-        category = categories[0]
+        category = Category.objects.filter(name__contains='Pairs').first()
         event = Event.objects.get(name=event_name)
         if db_skaters.filter(name=first_name1, surname=last_name1).exists():
             skater1 = db_skaters.filter(name=first_name1, surname=last_name1).first()

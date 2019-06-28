@@ -14,8 +14,7 @@ class Command(BaseCommand):
 
     def process_data(self, first_name, last_name, event_name, world_standings):
         db_skaters = Skater.objects.all()
-        categories = Category.objects.filter(name__contains='Men')
-        category = categories[0]
+        category = Category.objects.filter(name__contains='Men').first()
         event = Event.objects.get(name=event_name)
         if db_skaters.filter(name=first_name, surname=last_name).exists():
             self.stdout.write(self.style.SUCCESS(first_name))
