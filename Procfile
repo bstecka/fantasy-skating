@@ -1,0 +1,1 @@
+web: gunicorn fantasyskating.wsgi --log-file -
