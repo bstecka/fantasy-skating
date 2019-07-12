@@ -167,14 +167,12 @@ def user_page(request):
     return render(request, 'user_page.html', {'user': current_user, 'name_changed': 0, 'total_score': total_score})
 
 
-@login_required
 def get_class_assignments(event, category_class, category):
     return ClassAssignmentForEvent.objects.filter(event__name=event,
                                                   category_class__name=category_class,
                                                   competitor__skater_1__category__name=category)
 
 
-@login_required
 def save_choice(user, competitor_id, event, category, category_class):
     competitor = Competitor.objects.get(id=competitor_id)
     if Choice.objects.filter(user=user, event=event, category=category, category_class=category_class).exists():
@@ -188,7 +186,6 @@ def save_choice(user, competitor_id, event, category, category_class):
     return
 
 
-@login_required
 def save_choices(user, form, event):
     ladies = Category.objects.get(name='Ladies')
     men = Category.objects.get(name='Men')
