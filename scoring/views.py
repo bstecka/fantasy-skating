@@ -69,9 +69,9 @@ def ranking(request, page=1, is_overall=False, is_me=False):
                 user_sum = 0.0
         else:
             now = timezone.now()
-            if FakeDate.objects.filter(pk=1).exists():
-                now = FakeDate.objects.get(pk=1).date
-            #now = now - timedelta(days=235) #######################################################################DATES
+            if FakeDate.all.exists():
+                now = FakeDate.objects.all().first().date
+            ########################################################################DATES
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
             if len(events) > 0:
                 user_sum = EventUserScore.objects.filter(user=user, event=events[0]).aggregate(Sum('score'))['score__sum']
@@ -122,8 +122,8 @@ def ranking_ineffective(request, page, is_overall):
             user_choices = Choice.objects.filter(user=user)
         else:
             now = timezone.now()
-            if FakeDate.objects.filter(pk=1).exists():
-                now = FakeDate.objects.get(pk=1).date
+            if FakeDate.all.exists():
+                now = FakeDate.objects.all().first().date
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
             if len(events) > 0:
                 user_choices = Choice.objects.filter(user=user, event=events[0])
@@ -217,8 +217,8 @@ def save_choices(user, form, event):
 def choice_form_next(request):
     current_user = request.user
     now = timezone.now()
-    if FakeDate.objects.filter(pk=1).exists():
-        now = FakeDate.objects.get(pk=1).date
+    if FakeDate.all.exists():
+        now = FakeDate.objects.all().first().date
     events = Event.objects.filter(end_date__gte=now).order_by('start_date')
     if events.__len__() > 0:
         event = events[0]
@@ -269,8 +269,8 @@ def choice_form(request, event_path):
     DB = get_class_assignments(event, 'B', 'Ice Dance')
     DC = get_class_assignments(event, 'C', 'Ice Dance')
     now = timezone.now()
-    if FakeDate.objects.filter(pk=1).exists():
-        now = FakeDate.objects.get(pk=1).date
+    if FakeDate.all.exists():
+        now = FakeDate.objects.all().first().date
     events = Event.objects.all().order_by('start_date')
     choices = Choice.objects.filter(user=current_user, event=event)
     is_disabled = False
