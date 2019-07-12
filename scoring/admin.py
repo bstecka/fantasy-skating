@@ -107,75 +107,7 @@ class PlacementAdmin(admin.ModelAdmin):
             print('no upcoming events this season')
         return redirect('admin:index')
 
-    @admin.site.register_view('get-entries-nhk', 'Get event entries nhk')
-    def get_entries(request):
-        now = timezone.now()
-        if FakeDate.objects.all().exists():
-            now = FakeDate.objects.all().first().date
-        events = Event.objects.filter(start_date__gte=now).order_by('start_date')
-        if len(events) > 0:
-            last_event = Event.objects.get(short_name='NHK Trophy')
-            try:
-                management.call_command('get-entries-men', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-ladies', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-pairs', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-icedance', url=last_event.event_url, event_name=last_event.name)
-                message = 'successfully imported data from URL'
-            except Exception as ex:
-                message = 'Error importing from data from URL {}'.format(str(ex))
-            print(message)
-            entries = Entry.objects.filter(event=last_event)
-            assign_class(last_event, entries)
-        else:
-            print('no upcoming events this season')
-        return redirect('admin:index')
-
-    @admin.site.register_view('get-entries-rostelecom', 'Get event entries rostelecom')
-    def get_entries(request):
-        now = timezone.now()
-        if FakeDate.objects.all().exists():
-            now = FakeDate.objects.all().first().date
-        events = Event.objects.filter(start_date__gte=now).order_by('start_date')
-        if len(events) > 0:
-            last_event = Event.objects.get(short_name='Rostelecom Cup')
-            try:
-                management.call_command('get-entries-men', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-ladies', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-pairs', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-icedance', url=last_event.event_url, event_name=last_event.name)
-                message = 'successfully imported data from URL'
-            except Exception as ex:
-                message = 'Error importing from data from URL {}'.format(str(ex))
-            print(message)
-            entries = Entry.objects.filter(event=last_event)
-            assign_class(last_event, entries)
-        else:
-            print('no upcoming events this season')
-        return redirect('admin:index')
-
-    @admin.site.register_view('get-entries-fra', 'Get event entries france')
-    def get_entries(request):
-        now = timezone.now()
-        if FakeDate.objects.all().exists():
-            now = FakeDate.objects.all().first().date
-        events = Event.objects.filter(start_date__gte=now).order_by('start_date')
-        if len(events) > 0:
-            last_event = Event.objects.get(short_name='Internationaux de France')
-            try:
-                management.call_command('get-entries-men', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-ladies', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-pairs', url=last_event.event_url, event_name=last_event.name)
-                management.call_command('get-entries-icedance', url=last_event.event_url, event_name=last_event.name)
-                message = 'successfully imported data from URL'
-            except Exception as ex:
-                message = 'Error importing from data from URL {}'.format(str(ex))
-            print(message)
-            entries = Entry.objects.filter(event=last_event)
-            assign_class(last_event, entries)
-        else:
-            print('no upcoming events this season')
-        return redirect('admin:index')
-
+    '''
     @admin.site.register_view('get-all-results', 'Get all results')
     def get_all_results(request):
         now = timezone.now()
@@ -220,6 +152,76 @@ class PlacementAdmin(admin.ModelAdmin):
         else:
             print('no events this season')
         return redirect('admin:index')
+
+        @admin.site.register_view('get-entries-nhk', 'Get event entries nhk')
+        def get_entries(request):
+            now = timezone.now()
+            if FakeDate.objects.all().exists():
+                now = FakeDate.objects.all().first().date
+            events = Event.objects.filter(start_date__gte=now).order_by('start_date')
+            if len(events) > 0:
+                last_event = Event.objects.get(short_name='NHK Trophy')
+                try:
+                    management.call_command('get-entries-men', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-ladies', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-pairs', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-icedance', url=last_event.event_url, event_name=last_event.name)
+                    message = 'successfully imported data from URL'
+                except Exception as ex:
+                    message = 'Error importing from data from URL {}'.format(str(ex))
+                print(message)
+                entries = Entry.objects.filter(event=last_event)
+                assign_class(last_event, entries)
+            else:
+                print('no upcoming events this season')
+            return redirect('admin:index')
+
+        @admin.site.register_view('get-entries-rostelecom', 'Get event entries rostelecom')
+        def get_entries(request):
+            now = timezone.now()
+            if FakeDate.objects.all().exists():
+                now = FakeDate.objects.all().first().date
+            events = Event.objects.filter(start_date__gte=now).order_by('start_date')
+            if len(events) > 0:
+                last_event = Event.objects.get(short_name='Rostelecom Cup')
+                try:
+                    management.call_command('get-entries-men', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-ladies', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-pairs', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-icedance', url=last_event.event_url, event_name=last_event.name)
+                    message = 'successfully imported data from URL'
+                except Exception as ex:
+                    message = 'Error importing from data from URL {}'.format(str(ex))
+                print(message)
+                entries = Entry.objects.filter(event=last_event)
+                assign_class(last_event, entries)
+            else:
+                print('no upcoming events this season')
+            return redirect('admin:index')
+
+        @admin.site.register_view('get-entries-fra', 'Get event entries france')
+        def get_entries(request):
+            now = timezone.now()
+            if FakeDate.objects.all().exists():
+                now = FakeDate.objects.all().first().date
+            events = Event.objects.filter(start_date__gte=now).order_by('start_date')
+            if len(events) > 0:
+                last_event = Event.objects.get(short_name='Internationaux de France')
+                try:
+                    management.call_command('get-entries-men', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-ladies', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-pairs', url=last_event.event_url, event_name=last_event.name)
+                    management.call_command('get-entries-icedance', url=last_event.event_url, event_name=last_event.name)
+                    message = 'successfully imported data from URL'
+                except Exception as ex:
+                    message = 'Error importing from data from URL {}'.format(str(ex))
+                print(message)
+                entries = Entry.objects.filter(event=last_event)
+                assign_class(last_event, entries)
+            else:
+                print('no upcoming events this season')
+            return redirect('admin:index')
+    '''
 
 
 admin.site.register(Placement, PlacementAdmin)
