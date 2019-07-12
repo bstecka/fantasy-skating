@@ -1,1 +1,1 @@
-web: gunicorn fantasyskating.wsgi --log-file -
+web: gunicorn fantasyskating.wsgi
