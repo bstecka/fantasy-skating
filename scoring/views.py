@@ -69,7 +69,7 @@ def ranking(request, page=1, is_overall=False, is_me=False):
                 user_sum = 0.0
         else:
             now = timezone.now()
-            if FakeDate.all.exists():
+            if FakeDate.objects.all().exists():
                 now = FakeDate.objects.all().first().date
             ########################################################################DATES
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
@@ -122,7 +122,7 @@ def ranking_ineffective(request, page, is_overall):
             user_choices = Choice.objects.filter(user=user)
         else:
             now = timezone.now()
-            if FakeDate.all.exists():
+            if FakeDate.objects.all().exists():
                 now = FakeDate.objects.all().first().date
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
             if len(events) > 0:
@@ -217,7 +217,7 @@ def save_choices(user, form, event):
 def choice_form_next(request):
     current_user = request.user
     now = timezone.now()
-    if FakeDate.all.exists():
+    if FakeDate.objects.all().exists():
         now = FakeDate.objects.all().first().date
     events = Event.objects.filter(end_date__gte=now).order_by('start_date')
     if events.__len__() > 0:
@@ -269,7 +269,7 @@ def choice_form(request, event_path):
     DB = get_class_assignments(event, 'B', 'Ice Dance')
     DC = get_class_assignments(event, 'C', 'Ice Dance')
     now = timezone.now()
-    if FakeDate.all.exists():
+    if FakeDate.objects.all().exists():
         now = FakeDate.objects.all().first().date
     events = Event.objects.all().order_by('start_date')
     choices = Choice.objects.filter(user=current_user, event=event)

@@ -65,7 +65,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-results', 'Get newest results')
     def get_results(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
@@ -87,7 +87,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-entries', 'Get next event entries')
     def get_entries(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -110,7 +110,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-entries-nhk', 'Get event entries nhk')
     def get_entries(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -133,7 +133,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-entries-rostelecom', 'Get event entries rostelecom')
     def get_entries(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -156,7 +156,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-entries-fra', 'Get event entries france')
     def get_entries(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
@@ -179,7 +179,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-all-results', 'Get all results')
     def get_all_results(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
         if len(events) > 0:
@@ -201,7 +201,7 @@ class PlacementAdmin(admin.ModelAdmin):
     @admin.site.register_view('get-all-entries', 'Get all entries')
     def get_all_entries(request):
         now = timezone.now()
-        if FakeDate.all.exists():
+        if FakeDate.objects.all().exists():
             now = FakeDate.objects.all().first().date
         events = Event.objects.filter(start_date__gte=now).order_by('start_date')
         if len(events) > 0:
