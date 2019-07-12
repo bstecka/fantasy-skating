@@ -65,6 +65,8 @@ def ranking(request, page=1, is_overall=False, is_me=False):
     for user in users:
         if is_overall:
             user_sum = EventUserScore.objects.filter(user=user).aggregate(Sum('score'))['score__sum']
+            if user_sum is None:
+                user_sum = 0.0
         else:
             now = timezone.now()
             #now = now - timedelta(days=235) #######################################################################DATES
