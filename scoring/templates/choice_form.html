@@ -21,13 +21,42 @@
   <form method="post">
     {% csrf_token %}
         {% csrf_token %}
-    {% for field in form  %}
-      <div class="col-sm-4">
-        <div class="multiple-choice-field">
-          <div class="field-label">{{ field.label_tag }}</div><div class="field-option">{{ field }}</div>
-        </div>
+      <div class="row">
+          {% for field in form.visible_fields|slice:"0:3" %}
+          <div class="col-sm-4">
+              <div class="multiple-choice-field">
+                  <div class="field-label">{{ field.label_tag }}</div><div class="field-option">{{ field }}</div>
+              </div>
+          </div>
+          {% endfor %}
       </div>
-    {% endfor %}
+      <div class="row">
+          {% for field in form.visible_fields|slice:"3:6" %}
+          <div class="col-sm-4">
+              <div class="multiple-choice-field">
+                  <div class="field-label">{{ field.label_tag }}</div><div class="field-option">{{ field }}</div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+      <div class="row">
+          {% for field in form.visible_fields|slice:"6:9" %}
+          <div class="col-sm-4">
+              <div class="multiple-choice-field">
+                  <div class="field-label">{{ field.label_tag }}</div><div class="field-option">{{ field }}</div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+      <div class="row">
+          {% for field in form.visible_fields|slice:"9:12" %}
+          <div class="col-sm-4">
+              <div class="multiple-choice-field">
+                  <div class="field-label">{{ field.label_tag }}</div><div class="field-option">{{ field }}</div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
     <div class="text-center choose-button">
     <button class="btn btn-primary center" type="submit">Choose</button>
     </div>

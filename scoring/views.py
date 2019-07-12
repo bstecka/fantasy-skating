@@ -67,7 +67,7 @@ def ranking(request, page=1, is_overall=False, is_me=False):
             user_sum = EventUserScore.objects.filter(user=user).aggregate(Sum('score'))['score__sum']
         else:
             now = timezone.now()
-            now = now - timedelta(days=235) #######################################################################DATES
+            #now = now - timedelta(days=235) #######################################################################DATES
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
             if len(events) > 0:
                 user_sum = EventUserScore.objects.filter(user=user, event=events[0]).aggregate(Sum('score'))['score__sum']
@@ -212,41 +212,43 @@ def choice_form_next(request):
     now = timezone.now()
     # 255 days -> skate america, 245 -> skate canada, 238 -> gp helsinki, 230 -> nhk trophy
     last_year = now - timedelta(days=235)
-    event = Event.objects.filter(end_date__gte=last_year).order_by('start_date')[0]
-    event_name = event.name
-    events = Event.objects.all().order_by('start_date')
-    LA = get_class_assignments(event_name, 'A', 'Ladies')
-    LB = get_class_assignments(event_name, 'B', 'Ladies')
-    LC = get_class_assignments(event_name, 'C', 'Ladies')
-    MA = get_class_assignments(event_name, 'A', 'Men')
-    MB = get_class_assignments(event_name, 'B', 'Men')
-    MC = get_class_assignments(event_name, 'C', 'Men')
-    PA = get_class_assignments(event_name, 'A', 'Pairs')
-    PB = get_class_assignments(event_name, 'B', 'Pairs')
-    PC = get_class_assignments(event_name, 'C', 'Pairs')
-    DA = get_class_assignments(event_name, 'A', 'Ice Dance')
-    DB = get_class_assignments(event_name, 'B', 'Ice Dance')
-    DC = get_class_assignments(event_name, 'C', 'Ice Dance')
-    choices = Choice.objects.filter(user=current_user, event=event)
-    is_disabled = False
-    now = last_year
-    if now > event.start_date:
-        is_disabled = True
-    if request.method == 'POST':
-        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled, request.POST)
-        if form.is_valid():
-            form.save()
-            save_choices(current_user, form, event)
-            return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events, 'next_event_name': event_name})
-    else:
-        form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled)
-    return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events, 'next_event_name': event_name})
+    events = Event.objects.filter(end_date__gte=last_year).order_by('start_date')
+    if events.__len__() > 0:
+        event = events[0]
+        event_name = event.name
+        events = Event.objects.all().order_by('start_date')
+        LA = get_class_assignments(event_name, 'A', 'Ladies')
+        LB = get_class_assignments(event_name, 'B', 'Ladies')
+        LC = get_class_assignments(event_name, 'C', 'Ladies')
+        MA = get_class_assignments(event_name, 'A', 'Men')
+        MB = get_class_assignments(event_name, 'B', 'Men')
+        MC = get_class_assignments(event_name, 'C', 'Men')
+        PA = get_class_assignments(event_name, 'A', 'Pairs')
+        PB = get_class_assignments(event_name, 'B', 'Pairs')
+        PC = get_class_assignments(event_name, 'C', 'Pairs')
+        DA = get_class_assignments(event_name, 'A', 'Ice Dance')
+        DB = get_class_assignments(event_name, 'B', 'Ice Dance')
+        DC = get_class_assignments(event_name, 'C', 'Ice Dance')
+        choices = Choice.objects.filter(user=current_user, event=event)
+        is_disabled = False
+        now = last_year
+        if now > event.start_date:
+            is_disabled = True
+        if request.method == 'POST':
+            form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled, request.POST)
+            if form.is_valid():
+                form.save()
+                save_choices(current_user, form, event)
+                return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events, 'next_event_name': event_name})
+        else:
+            form = ChoiceForm(LA, LB, LC, MA, MB, MC, PA, PB, PC, DA, DB, DC, choices, is_disabled)
+        return render(request, 'choice_form.html', {'user': current_user, 'form': form, 'events': events, 'next_event_name': event_name})
+    return render(request, 'choice_form.html')
 
 
 @login_required
 def choice_form(request, event_path):
     current_user = request.user
-    print(event_path)
     event = Event.objects.filter(Q(event_url__contains=event_path))[0]
     LA = get_class_assignments(event, 'A', 'Ladies')
     LB = get_class_assignments(event, 'B', 'Ladies')
