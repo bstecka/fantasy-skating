@@ -111,3 +111,8 @@ class EventUserScore(models.Model):
 
     def __str__(self):
         return self.event.__str__() + ' ' + self.user.__str__() + ' ' + self.score.__str__()
+
+
+@python_2_unicode_compatible
+class FakeDate(models.Model):
+    date = models.DateTimeField(default=datetime.now, blank=True)
