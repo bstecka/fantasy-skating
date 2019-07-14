@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect, reverse
 from django.db.models import Q
 from .forms import RegistrationForm, ChangeTeamForm, ChoiceForm
-from .models import Competitor, Placement, ClassAssignmentForEvent, CategoryClass, Event, Category, Choice, EventUserScore
+from .models import Competitor, Placement, ClassAssignmentForEvent, CategoryClass, Event, Category, Choice, EventUserScore, FakeDate
 from django.db.models import Sum
 from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate
@@ -69,7 +69,9 @@ def ranking(request, page=1, is_overall=False, is_me=False):
                 user_sum = 0.0
         else:
             now = timezone.now()
-            #now = now - timedelta(days=235) #######################################################################DATES
+            if FakeDate.objects.all().exists():
+                now = FakeDate.objects.all().first().date
+            ########################################################################DATES
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
             if len(events) > 0:
                 user_sum = EventUserScore.objects.filter(user=user, event=events[0]).aggregate(Sum('score'))['score__sum']
@@ -120,6 +122,8 @@ def ranking_ineffective(request, page, is_overall):
             user_choices = Choice.objects.filter(user=user)
         else:
             now = timezone.now()
+            if FakeDate.objects.all().exists():
+                now = FakeDate.objects.all().first().date
             events = Event.objects.filter(end_date__lte=now).order_by('-end_date')
             if len(events) > 0:
                 user_choices = Choice.objects.filter(user=user, event=events[0])
@@ -213,9 +217,9 @@ def save_choices(user, form, event):
 def choice_form_next(request):
     current_user = request.user
     now = timezone.now()
-    # 255 days -> skate america, 245 -> skate canada, 238 -> gp helsinki, 230 -> nhk trophy
-    last_year = now - timedelta(days=235)
-    events = Event.objects.filter(end_date__gte=last_year).order_by('start_date')
+    if FakeDate.objects.all().exists():
+        now = FakeDate.objects.all().first().date
+    events = Event.objects.filter(end_date__gte=now).order_by('start_date')
     if events.__len__() > 0:
         event = events[0]
         event_name = event.name
@@ -234,7 +238,6 @@ def choice_form_next(request):
         DC = get_class_assignments(event_name, 'C', 'Ice Dance')
         choices = Choice.objects.filter(user=current_user, event=event)
         is_disabled = False
-        now = last_year
         if now > event.start_date:
             is_disabled = True
         if request.method == 'POST':
@@ -266,11 +269,11 @@ def choice_form(request, event_path):
     DB = get_class_assignments(event, 'B', 'Ice Dance')
     DC = get_class_assignments(event, 'C', 'Ice Dance')
     now = timezone.now()
-    last_year = now - timedelta(days=235)
+    if FakeDate.objects.all().exists():
+        now = FakeDate.objects.all().first().date
     events = Event.objects.all().order_by('start_date')
     choices = Choice.objects.filter(user=current_user, event=event)
     is_disabled = False
-    now = last_year
     if now > event.start_date:
         is_disabled = True
     if request.method == 'POST':
